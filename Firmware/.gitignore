@@ -1,0 +1,11 @@
+/*.uvmpw.uvgui.*
+/AppBase/*.scvd
+/AppBase/*.uvguix.*
+/AppBase/Objects
+/AppBase/Listings
+/AppBase/JLinkLog.txt
+/Bootloader/*.scvd
+/Bootloader/*.uvguix.*
+/Bootloader/Objects
+/Bootloader/Listings
+/Bootloader/JLinkLog.txt
