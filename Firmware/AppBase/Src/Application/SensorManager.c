@@ -144,10 +144,12 @@ static s_LSM6DSL_Context_t g_sLSM6DSLContext = {
 #if (EN_LIS2MDL == 1)
 static s_LIS2MDL_Context_t g_sLIS2MDLContext = {
    .eCommunicationUsed = LIS2MDL_COMM_I2C,
-   /* Function pointer to a read I2C transfer */
-   .fp_u32I2C_Read = &u32Hal_I2C_WriteAndReadNoStop,
-   /* Function pointer to a write I2C transfer */
-   .fp_u32I2C_Write = &u32Hal_I2C_Write,
+   .sI2CCfg = {
+      /* Function pointer to a read I2C transfer */
+      .fp_u32I2C_Write = &u32Hal_I2C_Write,
+      /* Function pointer to a write I2C transfer */
+      .fp_u32I2C_Read = &u32Hal_I2C_WriteAndReadNoStop
+   },
    /* Function pointer to a timer in ms */
    .fp_vDelay_ms = &vHal_Timer_DelayMs,
    };
