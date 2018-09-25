@@ -36,7 +36,7 @@
 #define HW_VERSION_REVISION   ((uint8_t)0u)
 
 /* COMMIT HASH */
-#define COMMIT_NUMBER "81e5597"
+#define COMMIT_NUMBER "5e7ac43"
 
 /************************************************************************
  * Type definitions

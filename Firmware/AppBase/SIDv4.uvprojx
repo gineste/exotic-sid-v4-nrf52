@@ -490,6 +490,11 @@
               <FileType>1</FileType>
               <FilePath>.\Src\Drivers\BME280\BME280.c</FilePath>
             </File>
+            <File>
+              <FileName>LIS2MDL.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\Drivers\LIS2MDL\LIS2MDL.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1416,6 +1421,11 @@
               <FileName>BME280.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Src\Drivers\BME280\BME280.c</FilePath>
+            </File>
+            <File>
+              <FileName>LIS2MDL.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\Drivers\LIS2MDL\LIS2MDL.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -37,7 +37,7 @@
 // <q> LIS2MDL Present
 // <i> The LSM6DSL sensor measures acceleration and gyroscope data on x, y and z axis.
 #ifndef EN_LIS2MDL
-#define EN_LIS2MDL 0
+#define EN_LIS2MDL 1
 #endif
 // <q> Battery Measurement
 #ifndef EN_BATT

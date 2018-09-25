@@ -132,7 +132,7 @@ static s_LSM6DSL_Context_t g_sLSM6DSLContext = {
    /* Function pointer to a write I2C transfer */
    .fp_u32I2C_Write = &u32Hal_I2C_Write,
    /* Function pointer to a timer in ms */
-   .fp_vDelay_ms = &nrf_delay_ms,
+   .fp_vDelay_ms = &vHal_Timer_DelayMs,
    
    .eAccelFullScale = LSM6DSL_ACCEL_RANGE_8G,
    .eAccelODR = LSM6DSL_ODR_104Hz,
@@ -143,14 +143,13 @@ static s_LSM6DSL_Context_t g_sLSM6DSLContext = {
 
 #if (EN_LIS2MDL == 1)
 static s_LIS2MDL_Context_t g_sLIS2MDLContext = {
+   .eCommunicationUsed = LIS2MDL_COMM_I2C,
    /* Function pointer to a read I2C transfer */
    .fp_u32I2C_Read = &u32Hal_I2C_WriteAndReadNoStop,
    /* Function pointer to a write I2C transfer */
    .fp_u32I2C_Write = &u32Hal_I2C_Write,
    /* Function pointer to a timer in ms */
-   .fp_vDelay_ms = &nrf_delay_ms,
-   
-   .eMagnetometerODR = LIS2MDL_ODR_10Hz
+   .fp_vDelay_ms = &vHal_Timer_DelayMs,
    };
 #endif
 
@@ -444,9 +443,9 @@ static void vInitnSleepAllSensors(void)
 #endif
    
 #if (EN_LIS2MDL == 1)
-   if(eLIS2MDL_Initialization(g_sLIS2MDLContext) != LIS2MDL_ERROR_NONE)
+   if(eLIS2MDL_ContextSet(g_sLIS2MDLContext) == LIS2MDL_ERROR_NONE)
    {
-      __nop();
+      eLIS2MDL_LowPower(1u);
    }      
 #endif
    
@@ -559,11 +558,15 @@ static void vMagGet(uint8_t * p_pau8Data, uint8_t * p_pu8Size)
    int16_t l_s16MagX = 0;
    int16_t l_s16MagY = 0;
    int16_t l_s16MagZ = 0;
-   eLIS2MDL_Read();
-   vLIS2MDL_DataGet(&l_s16MagX, &l_s16MagY, &l_s16MagZ);
-   g_sSensorsData.s16MagX = l_s16MagX;
-   g_sSensorsData.s16MagY = l_s16MagY;
-   g_sSensorsData.s16MagZ = l_s16MagZ;
+   if(eLIS2MDL_MagneticRead() == LIS2MDL_ERROR_NONE)
+   {
+      if(eLIS2MDL_MagDataGet(&l_s16MagX, &l_s16MagY, &l_s16MagZ) == LIS2MDL_ERROR_NONE)
+      {
+         g_sSensorsData.s16MagX = l_s16MagX;
+         g_sSensorsData.s16MagY = l_s16MagY;
+         g_sSensorsData.s16MagZ = l_s16MagZ;
+      }
+   }
 }
 #endif /* (EN_LIS2MDL == 1) */
 
