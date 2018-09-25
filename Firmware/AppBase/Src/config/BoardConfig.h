@@ -26,7 +26,7 @@
 // <q> BME280 Present
 // <i> The Bosch BME280 sensor measures temperature, pressure and humidity data.
 #ifndef EN_BME280
-#define EN_BME280 0
+#define EN_BME280 1
 #endif
 // <q> LSM6DSL Present
 // <i> The LSM6DSL sensor measures acceleration and gyroscope data on x, y and z axis.

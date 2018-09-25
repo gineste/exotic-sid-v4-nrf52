@@ -38,23 +38,12 @@
 #define MAX_FRAME_SIZE  MAX_FRAME_BUILD_SIZE
 
 #define OFFSET_PRESSURE (uint16_t)300u
-#define OFFSET_TEMP     (int16_t)-400u
+#define OFFSET_TEMP     (int16_t)-400
 
 #define TEMPERATURE_MIN -400                 /* in 0.1°C */
 #define TEMPERATURE_MAX 850                  /* in 0.1°C */
-#define ACCURATE_TEMPERATURE_MIN -550        /* in 0.1°C */
-#define ACCURATE_TEMPERATURE_MAX 1500        /* in 0.1°C */
 #define PRESSURE_MIN    3000u                /* in 1/10 hPa */
 #define PRESSURE_MAX    11000u               /* in 1/10 hPa */
-
-#define VECTOR_XY_SIZE     (uint8_t)13u
-#define VECTOR_Z_SIZE      (uint8_t)12u
-#define VECTOR_YZ_SIZE     (uint8_t)2u
-
-#define VECTOR_U_SIZE      (uint8_t)VECTOR_XY_SIZE
-#define VECTOR_V_SIZE      (uint8_t)VECTOR_Z_SIZE
-
-#define CHAR_BIT 8u
 
 /****************************************************************************************
  * Private type declarations

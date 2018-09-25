@@ -113,19 +113,14 @@ static void vInitnSleepAllSensors(void);
  * Variable declarations
  ************************************************************************/
 #if (EN_BME280 == 1)
-   static s_Bme280_Context_t g_sBME280Context = {
-      .u8ChipId = 0u,
-      .u8DevAddr = BME280_I2C_ADDR_1,
-      .sSettings = {
-         .eOversampling_P = BME280_OVERSAMPLING_1X,
-         .eOversampling_T = BME280_OVERSAMPLING_1X,
-         .eOversampling_H = BME280_OVERSAMPLING_1X,
-         .eFilter = BME280_FILTER_COEFF_2,
-         .eStandbyTime = BME280_STANDBY_TIME_1000_MS,
+   static s_BME280_Context_t g_sBME280Context = {
+      .eInterface = BME280_I2C_ITF,
+      .sI2CCfg = {
+         .eI2CAddr = BME280_I2C_ADDR_GND,
+         .fp_u32I2C_Write = &u32Hal_I2C_Write,
+         .fp_u32I2C_Read = &u32Hal_I2C_WriteAndRead
       },
-      .fpu32Write = NULL,
-      .fpu32Read = NULL,
-      .fpvDelayMs = &nrf_delay_ms,
+      .fp_vTimerDelay_ms = &vHal_Timer_DelayMs
    };
 #endif /* EN_BME280 */
    
@@ -456,7 +451,9 @@ static void vInitnSleepAllSensors(void)
 #endif
    
 #if (EN_BME280 == 1)
-   eBME280_Initialization(g_sBME280Context);
+   eBME280_ContextSet(g_sBME280Context);
+   eBME280_IIRFilterSet(BME280_FILTER_COEFF_OFF);
+   eBME280_ModeSet(BME280_FORCED);
 #endif
 
 #if (EN_RFID == 1)
@@ -468,27 +465,28 @@ static void vInitnSleepAllSensors(void)
 #if (EN_BME280 == 1)
 static void vTPHStop(void)
 {
-   eBME280_SensorDisable(BME280_TEMP_SENSOR);
-   eBME280_SensorDisable(BME280_PRESS_SENSOR);
-   eBME280_SensorDisable(BME280_HUM_SENSOR);
+   eBME280_OSRTemperatureSet(BME280_NO_OVERSAMPLING);
+   eBME280_OSRPressureSet(BME280_NO_OVERSAMPLING);
+   eBME280_OSRHumiditySet(BME280_NO_OVERSAMPLING);
 }
 static void vTPHActivate(void)
 {
-   eBME280_SensorEnable(BME280_TEMP_SENSOR);
-   eBME280_SensorEnable(BME280_PRESS_SENSOR);
-   eBME280_SensorEnable(BME280_HUM_SENSOR);
+   eBME280_OSRTemperatureSet(BME280_OVERSAMPLING_1X);
+   eBME280_OSRPressureSet(BME280_OVERSAMPLING_1X);
+   eBME280_OSRHumiditySet(BME280_OVERSAMPLING_1X);
 }
 
 static void vTPHGet(uint8_t * p_pau8Data, uint8_t * p_pu8Size)
 {
-   int32_t l_s32Temperature;
-   uint32_t l_u32Humidity;
-   uint32_t l_u32Pressure;
-   (void)eBME280_ModeSet(BME280_FORCED);
-	(void)eBME280_TPHGet(&l_s32Temperature, &l_u32Pressure, &l_u32Humidity);
-   g_sSensorsData.s16Temperature = (int16_t)(((l_s32Temperature) + 5)/ 10);
-   g_sSensorsData.u16Pressure = (uint16_t)(((l_u32Pressure) + 5u)/ 10u);
-   g_sSensorsData.u8Humidity = (uint16_t)(((l_u32Humidity) + 500u)/ 1000u);
+   float l_f32Data = 0.0f;
+   
+   eBME280_TPHRead();
+   eBME280_TemperatureGet(&l_f32Data);
+   g_sSensorsData.s16Temperature = (int16_t)(l_f32Data * 10.0f);
+   eBME280_PressureGet(&l_f32Data);
+   g_sSensorsData.u16Pressure = (uint16_t)(l_f32Data * 10.0f);
+   eBME280_HumidityGet(&l_f32Data);
+   g_sSensorsData.u8Humidity = (uint16_t)(l_f32Data)  ;
 }
 #endif /* (EN_BME280 == 1) */
 

@@ -53,6 +53,7 @@ e_HalTimerErrorCode_t eHal_Timer_Start(s_HalTimerId_t p_sTimerID, uint32_t p_u32
 e_HalTimerErrorCode_t eHal_Timer_Stop(s_HalTimerId_t p_sTimerID);
 e_HalTimerErrorCode_t eHal_Timer_StopAll(void);
 uint32_t u32Hal_Timer_GetTicks(void);
+void vHal_Timer_DelayMs(uint32_t p_u32DelayMs);
 
 #endif /* HAL_TIMER_H */
 

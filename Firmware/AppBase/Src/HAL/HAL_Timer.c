@@ -19,7 +19,7 @@
  * Include Files
  ****************************************************************************************/
 #include <stdint.h>
-
+#include <nrf_delay.h>
 #include "HAL_Timer.h"
 
 /****************************************************************************************
@@ -132,6 +132,11 @@ uint32_t u32Hal_Timer_GetTicks(void)
    l_u32Ticks = app_timer_cnt_get();
    
    return l_u32Ticks;
+}
+
+void vHal_Timer_DelayMs(uint32_t p_u32DelayMs)
+{
+   nrf_delay_ms(p_u32DelayMs);
 }
 
 /****************************************************************************************
