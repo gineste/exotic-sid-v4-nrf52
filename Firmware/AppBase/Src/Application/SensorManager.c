@@ -34,7 +34,7 @@
 #include "HAL/HAL_Timer.h"
 
 /* Sensor Drivers include */
-#if (EN_LSM6MDL == 1)
+#if (EN_LSM6DSL == 1)
    #include "LSM6DSL/LSM6DSL.h"
 #endif
 #if (EN_LIS2MDL == 1)
@@ -126,18 +126,17 @@ static void vInitnSleepAllSensors(void);
    
 #if (EN_LSM6DSL == 1)
 static s_LSM6DSL_Context_t g_sLSM6DSLContext = {
-   .u8I2CAddress = LSM6DSL_SLAVE_ADDR_VCC,                  /* Sensor Address */
-   /* Function pointer to a read I2C transfer */
-   .fp_u32I2C_Read = &u32Hal_I2C_WriteAndReadNoStop,
-   /* Function pointer to a write I2C transfer */
-   .fp_u32I2C_Write = &u32Hal_I2C_Write,
+   .eInterface = LSM6DSL_ITF_I2C,
+   .sI2CCfg = {
+      /* Sensor Address */ 
+      .eI2CAddress = LSM6DSL_I2C_ADDR_VCC,                    
+      /* Function pointer to a read I2C transfer */
+      .fp_u32I2C_Read = &u32Hal_I2C_WriteAndReadNoStop,
+      /* Function pointer to a write I2C transfer */
+      .fp_u32I2C_Write = &u32Hal_I2C_Write,
+   },
    /* Function pointer to a timer in ms */
-   .fp_vDelay_ms = &vHal_Timer_DelayMs,
-   
-   .eAccelFullScale = LSM6DSL_ACCEL_RANGE_8G,
-   .eAccelODR = LSM6DSL_ODR_104Hz,
-   .eGyroFullScale = LSM6DSL_GYRO_RANGE_500DPS,
-   .eGyroODR = LSM6DSL_ODR_52Hz
+   .fp_vDelay_ms = &vHal_Timer_DelayMs,   
    };
 #endif
 
@@ -438,9 +437,10 @@ uint8_t u8SensorMngr_IsSensorsDead(void)
 static void vInitnSleepAllSensors(void)
 {
 #if (EN_LSM6DSL == 1)
-   if(eLSM6DSL_Initialization(g_sLSM6DSLContext) != LSM6DSL_ERROR_NONE)
+   if(eLSM6DSL_ContextSet(g_sLSM6DSLContext) == LSM6DSL_ERROR_NONE)
    {
-      __nop();
+      eLSM6DSL_AccelCfgSet(LSM6DSL_ODR_12_5Hz, LSM6DSL_ACCEL_RANGE_2G);
+      eLSM6DSL_GyroCfgSet(LSM6DSL_ODR_12_5Hz, LSM6DSL_GYRO_RANGE_250DPS);
    }   
 #endif
    
@@ -507,12 +507,20 @@ static void vAccelWakeUp(void)
 /**@brief Function to get accelerometer measurement.
  */
 static void vAccelGet(uint8_t * p_pau8Data, uint8_t * p_pu8Size)
-{   
-   s_LSM6DSL_3AxisRawData_t l_sRawAxis;
-   vLSM6DSL_AccelRead(&l_sRawAxis);
-   g_sSensorsData.s16AccelX = l_sRawAxis.RawSigned.s16DataX;
-   g_sSensorsData.s16AccelY = l_sRawAxis.RawSigned.s16DataY;
-   g_sSensorsData.s16AccelZ = l_sRawAxis.RawSigned.s16DataZ;
+{
+   int16_t l_s16X = 0;
+   int16_t l_s16Y = 0;
+   int16_t l_s16Z = 0;
+   
+   if(eLSM6DSL_AccelRead() == LSM6DSL_ERROR_NONE)
+   {
+      if(eLSM6DSL_AccelGet(&l_s16X, &l_s16Y, &l_s16Z) == LSM6DSL_ERROR_NONE)
+      {
+         g_sSensorsData.s16AccelX = l_s16X;
+         g_sSensorsData.s16AccelY = l_s16Y;
+         g_sSensorsData.s16AccelZ = l_s16Z;
+      }
+   }
 }
 
 /**@brief Function to stop gyro acquisition of data from sensor.
@@ -531,11 +539,19 @@ static void vGyroWakeUp(void)
  */
 static void vGyroGet(uint8_t * p_pau8Data, uint8_t * p_pu8Size)
 {
-   s_LSM6DSL_3AxisRawData_t l_sRawAxis;
-   vLSM6DSL_GyroRead(&l_sRawAxis);
-   g_sSensorsData.s16GyroX = l_sRawAxis.RawSigned.s16DataX;
-   g_sSensorsData.s16GyroY = l_sRawAxis.RawSigned.s16DataY;
-   g_sSensorsData.s16GyroZ = l_sRawAxis.RawSigned.s16DataZ;
+   int16_t l_s16X = 0;
+   int16_t l_s16Y = 0;
+   int16_t l_s16Z = 0;
+   
+   if(eLSM6DSL_GyroRead() == LSM6DSL_ERROR_NONE)
+   {
+      if(eLSM6DSL_GyroGet(&l_s16X, &l_s16Y, &l_s16Z) == LSM6DSL_ERROR_NONE)
+      {
+         g_sSensorsData.s16GyroX = l_s16X;
+         g_sSensorsData.s16GyroY = l_s16Y;
+         g_sSensorsData.s16GyroZ = l_s16Z;
+      }
+   }
 }
 
 #endif /* (EN_LSM6DSL == 1) */
