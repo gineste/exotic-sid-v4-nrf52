@@ -41,7 +41,7 @@
 #endif
 // <q> Battery Measurement
 #ifndef EN_BATT
-#define EN_BATT 0
+#define EN_BATT 1
 #endif
 
 #ifndef SENSOR_NUMBER
@@ -176,7 +176,7 @@
 // <q> CC430 not soldered
 // <i> NO_CC430_ON_BOARD
 #ifndef NO_CC430_ON_BOARD
-#define NO_CC430_ON_BOARD 1
+#define NO_CC430_ON_BOARD 0
 #endif
 
 // <q> Disable Frame Check

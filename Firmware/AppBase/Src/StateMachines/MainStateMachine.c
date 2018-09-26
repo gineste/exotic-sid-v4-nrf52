@@ -129,11 +129,7 @@ void vMSM_Init(void)
    
    CLEAR_TERMINAL();
    PRINT_INFO("%s","\n/****************************/\n");
-#if (SIDv == 3)
-   PRINT_INFO("%s","/*          SID v3          */\n");
-#else
    PRINT_INFO("%s","/*          SID v4          */\n");
-#endif
    PRINT_INFO("%s","/*      nRF v ");
    PRINT_INFO("%02d.",FW_VERSION_MAJOR);
       PRINT_INFO("%02d.",FW_VERSION_MINOR);

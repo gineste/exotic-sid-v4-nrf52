@@ -195,10 +195,6 @@ void vSensorMngr_Init(void)
 {
    /* Init and put sensors in sleep */
    vInitnSleepAllSensors();
-
-#if (EN_BATT == 1)
-//   vBattery_Init();
-#endif
 }
 
 /**@brief   Function to Shutdown all sensors.
@@ -452,9 +448,14 @@ static void vInitnSleepAllSensors(void)
 #endif
    
 #if (EN_BME280 == 1)
-   eBME280_ContextSet(g_sBME280Context);
-   eBME280_IIRFilterSet(BME280_FILTER_COEFF_OFF);
-   eBME280_ModeSet(BME280_FORCED);
+   if(eBME280_ContextSet(g_sBME280Context) == BME280_ERROR_NONE)
+   {
+      eBME280_IIRFilterSet(BME280_FILTER_COEFF_OFF);
+      eBME280_OSRTemperatureSet(BME280_OVERSAMPLING_1X);
+      eBME280_OSRPressureSet(BME280_OVERSAMPLING_1X);
+      eBME280_OSRHumiditySet(BME280_OVERSAMPLING_1X);
+      eBME280_ModeSet(BME280_FORCED);
+   }
 #endif
 
 #if (EN_RFID == 1)
@@ -481,13 +482,21 @@ static void vTPHGet(uint8_t * p_pau8Data, uint8_t * p_pu8Size)
 {
    float l_f32Data = 0.0f;
    
-   eBME280_TPHRead();
-   eBME280_TemperatureGet(&l_f32Data);
-   g_sSensorsData.s16Temperature = (int16_t)(l_f32Data * 10.0f);
-   eBME280_PressureGet(&l_f32Data);
-   g_sSensorsData.u16Pressure = (uint16_t)(l_f32Data * 10.0f);
-   eBME280_HumidityGet(&l_f32Data);
-   g_sSensorsData.u8Humidity = (uint16_t)(l_f32Data)  ;
+   if(eBME280_TPHRead() == BME280_ERROR_NONE)
+   {
+      if(eBME280_TemperatureGet(&l_f32Data) == BME280_ERROR_NONE)
+      {
+         g_sSensorsData.s16Temperature = (int16_t)(l_f32Data * 10.0f);
+      }
+      if(eBME280_PressureGet(&l_f32Data) == BME280_ERROR_NONE)
+      {
+         g_sSensorsData.u16Pressure = (uint16_t)(l_f32Data * 10.0f);
+      }
+      if(eBME280_HumidityGet(&l_f32Data) == BME280_ERROR_NONE)
+      {
+         g_sSensorsData.u8Humidity = (uint16_t)(l_f32Data);
+      }
+   }
 }
 #endif /* (EN_BME280 == 1) */
 
