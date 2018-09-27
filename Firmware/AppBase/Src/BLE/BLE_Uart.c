@@ -359,7 +359,7 @@ static void vBleUart_OnTxComplete(ble_evt_t const * p_pcsBleEvt)
 
             if(l_u32ErrCode == NRF_SUCCESS)
             {
-               #if (LOG_BLE == 1) 
+               #if (LOG_BLE_TX == 1) 
                   PRINT_T2_ARRAY("%02X", &(g_sBle_Uart_TxInfo.au8DataToSend[g_sBle_Uart_TxInfo.u8Seg * g_u16SegSize]), l_u16DataSent);
                   PRINT_T2("%s","\n");
                #endif

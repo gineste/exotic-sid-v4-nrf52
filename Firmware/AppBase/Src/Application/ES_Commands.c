@@ -23,11 +23,16 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "BoardConfig.h"
+#include "GlobalDefs.h"
+
 /* Application includes */
 #include "FrameBuilder.h"
 #include "MainStateMachine.h"
 #include "ModeManagement.h"
 #include "SID_Storage.h"
+
+#include "Version.h"
 
 /* HAL includes */
 
@@ -39,10 +44,6 @@
 
 /* Libraries includes */
 #include "Libraries/ES_Protocol/ES_Interfaces.h"
-
-#include "Version.h"
-
-#include "GlobalDefs.h"
 
 #include "ES_OpCodes.h"
 #include "ES_SlaveMngt.h"
@@ -63,7 +64,8 @@
  * Private function declarations
  ************************************************************************/
 static e_ES_AckCode_t eFirmwareVersionGet(uint32_t p_u32Recipient, uint8_t * p_pau8Data, uint8_t * p_pu8Size);
-
+static void vProductNameGet(uint8_t * p_pu8ProductName, uint8_t * p_pu8Size);
+   
 /************************************************************************
  * Variable declarations
  ************************************************************************/
@@ -88,15 +90,17 @@ void vES_CommandHandler(uint8_t p_u8OpCode, uint32_t p_u32Expdt, uint32_t p_u32R
    e_ES_AckCode_t l_eAckRet = ES_ACK_NOK;
    e_ES_ExpRecpt_t l_eExpeditor = ES_HOST_NRF;
       
-#if (LOG_BLE == 1)
+#if (LOG_BLE_RX == 1)
    PRINT_T2("Ble Rcv : 0x%02x\n",p_u8OpCode);
-#endif   /* LOG_BLE */
+#endif   /* LOG_BLE_RX */
+   
    if(p_u32Recpt == ES_HOST_NRF)
    {
       switch((e_ES_OpCode_t)p_u8OpCode)
       {
       /* Generic OpCode Cmd 0x00 - 0x1F */
          case CMD_RESET :                          /* Reset recipient */
+            NVIC_SystemReset();
             break;
          case CMD_GET_BOOTLOADER_VERSION :         /* Get Bootloader Version */
             break;
@@ -113,13 +117,18 @@ void vES_CommandHandler(uint8_t p_u8OpCode, uint32_t p_u32Expdt, uint32_t p_u32R
             l_u8SendAck = 1u;  
             break;
          case CMD_GET_PRODUCT_NAME :               /* Get Product Name */
+            vProductNameGet(l_au8BufferOut, &l_u8SizeOut);
+            l_eAckRet = ES_ACK_OK;
+            l_u8SendAck = 1u;              
+            break;
          case CMD_GET_SERIAL_NUMBER :              /* Get Serial Number */
             break;
          case CMD_GET_COMPILATION_DATA :           /* Get Compilation Data (Build Date/Time) */         
-            l_au8BufferOut[l_u8SizeOut++] = strlen(BUILD_DATE) + strlen(BUILD_TIME) + 1u; /* Separate with ';' */
+            l_au8BufferOut[0u] = strlen(BUILD_DATE) + strlen(BUILD_TIME) + 1u; /* Separate with ';' */
             memcpy(&l_au8BufferOut[1u], BUILD_DATE, strlen(BUILD_DATE));
             l_au8BufferOut[1u +  strlen(BUILD_DATE)] = ';';
             memcpy(&l_au8BufferOut[2u + strlen(BUILD_DATE)], BUILD_TIME, strlen(BUILD_TIME));
+            l_u8SizeOut = l_au8BufferOut[0u] + 1u;
             l_eAckRet = ES_ACK_OK;
             l_u8SendAck = 1u;
             break;
@@ -128,7 +137,7 @@ void vES_CommandHandler(uint8_t p_u8OpCode, uint32_t p_u32Expdt, uint32_t p_u32R
          case CMD_SENSOR_CYC_DATA_SUB:             /* Select desired cmd to stream at specific data rate */
             if(eFrameBuilder_CfgUpdate((e_FrameBuilder_Command_t)p_pu8Data[0u]) != FRAME_BLD_ERROR_NONE)
             {
-               l_eAckRet = ES_ACK_NOK;            
+               l_eAckRet = ES_ACK_NOK;
             }
             else
             {
@@ -278,6 +287,18 @@ static e_ES_AckCode_t eFirmwareVersionGet(uint32_t p_u32Recipient, uint8_t * p_p
    }
 
    return l_eAckRet;
+}
+
+static void vProductNameGet(uint8_t * p_pu8ProductName, uint8_t * p_pu8Size)
+{
+   if(   (p_pu8ProductName != NULL)
+      && (p_pu8Size != NULL) )
+   {
+      (*p_pu8Size) = 0u;
+      p_pu8ProductName[(*p_pu8Size)++] = BOARD_TYPE;
+      p_pu8ProductName[(*p_pu8Size)++] = MSB_16B_TO_8B(USE_CASE_NUMBER);
+      p_pu8ProductName[(*p_pu8Size)++] = LSB_16B_TO_8B(USE_CASE_NUMBER);
+   }
 }
 
 /************************************************************************
