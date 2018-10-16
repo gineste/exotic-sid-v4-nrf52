@@ -24,6 +24,8 @@
 
 #include "app_error.h"
 
+#include "BoardConfig.h"
+
 #include "GlobalDefs.h"
 #include "HAL_GPIO.h"
 

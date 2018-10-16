@@ -79,12 +79,12 @@
 // <o> Slow Advertise Time out - seconds <0-3600:5>
 // <i> Timeout between  0 sec(unlimited) and 1h with step of 5 sec - SLOW_ADV_TIMEOUT_BLE
 #ifndef SLOW_ADV_TIMEOUT_BLE
-#define SLOW_ADV_TIMEOUT_BLE 0
+#define SLOW_ADV_TIMEOUT_BLE 60
 #endif
 // <o> WakeUp BLE after end of advertising Time out - seconds <00-600:10>
 // <i> Timeout between 0 sec(unlimited) and 10 min with step of 10 sec - WAKE_ADV_TIMEOUT_BLE
 #ifndef WAKE_ADV_TIMEOUT_BLE
-#define WAKE_ADV_TIMEOUT_BLE 0
+#define WAKE_ADV_TIMEOUT_BLE 30
 #endif
 #define WAKE_ADV_TIMEOUT_BLE_MS (uint32_t)(WAKE_ADV_TIMEOUT_BLE * 1000u)
 // <s> Default Prefix BLE Name
@@ -136,17 +136,17 @@
 // <e> Enable LOG
 // <i> EN_LOG
 #ifndef EN_LOG
-#define EN_LOG 1
+#define EN_LOG 0
 #endif
 // <q> Log BLE Transmit
 // <i> LOG_BLE_TX
 #ifndef LOG_BLE_TX
-#define LOG_BLE_TX 1
+#define LOG_BLE_TX 0
 #endif
 // <q> Log BLE Received
 // <i> LOG_BLE_RX
 #ifndef LOG_BLE_RX
-#define LOG_BLE_RX 1
+#define LOG_BLE_RX 0
 #endif
 // <q> Log CC430
 // <i> LOG_CC430

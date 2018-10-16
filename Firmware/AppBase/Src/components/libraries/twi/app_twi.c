@@ -43,7 +43,7 @@
 #include "nrf_assert.h"
 #include "app_util_platform.h"
 
-#define HW_TIMEOUT            30000 // Slightly more than 256 char for one transaction
+#define HW_TIMEOUT            50000 // Slightly more than 256 char for one transaction
 
 static ret_code_t start_transfer(app_twi_t const * p_app_twi)
 {
@@ -332,7 +332,7 @@ ret_code_t app_twi_perform(app_twi_t const *          p_app_twi,
 
     bool busy = false;
 
-    int16_t timeout = HW_TIMEOUT;
+    int32_t timeout = HW_TIMEOUT;
     CRITICAL_REGION_ENTER();
     if (p_app_twi->p_app_twi_cb->internal_transaction_in_progress)
     {

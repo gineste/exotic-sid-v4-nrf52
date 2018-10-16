@@ -88,9 +88,12 @@ void vDeepSleep_Entry(void)
    }
    if(WAKE_ADV_TIMEOUT_BLE_MS != 0u)
    {
-      (void)eHal_Timer_Start(g_DeepSleepWakeUpTimerIdx, WAKE_ADV_TIMEOUT_BLE_MS);
+      if(eHal_Timer_Start(g_DeepSleepWakeUpTimerIdx, WAKE_ADV_TIMEOUT_BLE_MS) != HAL_TIMER_ERROR_NONE)
+      {
+         g_u8TimeoutWakeUp = 1u;
+      }
    }
-   PRINT_DEBUG("Wake Up with Motion, RFID or Timeout (%d ms)\n",WAKE_ADV_TIMEOUT_BLE_MS);
+   PRINT_DEBUG("Wake Up with Motion, RFID or Timeout(%d ms)\n",WAKE_ADV_TIMEOUT_BLE_MS);
    
    vSensorMngr_WakeUpSensor();   
    vSensorMngr_ShutdownSensor();

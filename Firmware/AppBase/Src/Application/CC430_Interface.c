@@ -392,11 +392,11 @@ static uint8_t u8ReplySizeGet(uint8_t p_u8OpCode)
 static void vIsReadyToRead(void * p_vContext)
 {
    uint8_t l_u8Retry = RETRY_DELAY_NB;
-   uint32_t l_u32PinState = u32Hal_GPIO_Read(IRQ_CC);
+   uint32_t l_u32PinState = 1u;
    
    do{
       nrf_delay_ms(DELAY_WR_N_RD);
-      l_u32PinState = u32Hal_GPIO_Read(IRQ_CC);
+      l_u32PinState = u32Hal_GPIO_Read(INT_CC);
       l_u8Retry--;
    }while((l_u32PinState == 1u) && (l_u8Retry > 0u));
    __nop();

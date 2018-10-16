@@ -21,7 +21,6 @@
 #include <nrf_gpiote.h>
 #include <nrf_drv_gpiote.h>
 
-#include "BoardConfig.h"
 #include "board.h"
 
 /************************************************************************

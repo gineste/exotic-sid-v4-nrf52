@@ -444,6 +444,7 @@ static void vInitnSleepAllSensors(void)
    if(eLIS2MDL_ContextSet(g_sLIS2MDLContext) == LIS2MDL_ERROR_NONE)
    {
       eLIS2MDL_LowPower(1u);
+      eLIS2MDL_ModeSet(LIS2MDL_MODE_IDLE_DEFAULT);
    }      
 #endif
    
@@ -505,12 +506,14 @@ static void vTPHGet(uint8_t * p_pau8Data, uint8_t * p_pu8Size)
  */
 static void vAccelShutdown(void)
 {
+      eLSM6DSL_AccelCfgSet(LSM6DSL_ODR_POWER_DOWN, LSM6DSL_ACCEL_RANGE_2G);
 //   vLSM6DSL_AccelEnable(0u);
 }
 /**@brief Function to activate accelerometer acquisition of data from sensor.
  */
 static void vAccelWakeUp(void)
 {
+      eLSM6DSL_AccelCfgSet(LSM6DSL_ODR_12_5Hz, LSM6DSL_ACCEL_RANGE_2G);
 //   vLSM6DSL_AccelEnable(1u);
 }
 /**@brief Function to get accelerometer measurement.
@@ -536,12 +539,14 @@ static void vAccelGet(uint8_t * p_pau8Data, uint8_t * p_pu8Size)
  */
 static void vGyroShutdown(void)
 {
+      eLSM6DSL_GyroCfgSet(LSM6DSL_ODR_POWER_DOWN, LSM6DSL_GYRO_RANGE_250DPS);
 //   vLSM6DSL_GyroEnable(0u);
 }
 /**@brief Function to activate gyro acquisition of data from sensor.
  */
 static void vGyroWakeUp(void)
 {
+      eLSM6DSL_GyroCfgSet(LSM6DSL_ODR_12_5Hz, LSM6DSL_GYRO_RANGE_250DPS);
 //   vLSM6DSL_GyroEnable(1u);
 }
 /**@brief Function to get Gyro measurement.
