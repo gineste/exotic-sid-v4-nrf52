@@ -37,6 +37,15 @@
    
 #define BIT_MASK(val,mask,shift)    ((((uint32_t)val) & ((uint32_t)mask)) >> ((uint32_t)shift))
    
+#define XXXMSB_64B_TO_8B(x)   ((uint8_t)((((uint64_t)x) & 0xFF00000000000000) >> 56u))
+#define XXMSB_64B_TO_8B(x)    ((uint8_t)((((uint64_t)x) & 0x00FF000000000000) >> 48u))
+#define XMSB_64B_TO_8B(x)     ((uint8_t)((((uint64_t)x) & 0x0000FF0000000000) >> 40u))
+#define MSB_64B_TO_8B(x)      ((uint8_t)((((uint64_t)x) & 0x000000FF00000000) >> 32u))
+#define LSB_64B_TO_8B(x)      ((uint8_t)((((uint64_t)x) & 0x00000000FF000000) >> 24u))
+#define XLSB_64B_TO_8B(x)     ((uint8_t)((((uint64_t)x) & 0x0000000000FF0000) >> 16u))
+#define XXLSB_64B_TO_8B(x)    ((uint8_t)((((uint64_t)x) & 0x000000000000FF00) >> 8u))
+#define XXXLSB_64B_TO_8B(x)   ((uint8_t)((((uint64_t)x) & 0x00000000000000FF)))
+   
 /** The higher 8 bits of a upper 16 bits of a 32 bit value */
 #define XMSB_32B_TO_8B(x)   ((uint8_t)((((uint32_t)x) & 0xFF000000) >> 24u))
 /** The lower 8 bits of a upper 16 bits of a 32 bit value */

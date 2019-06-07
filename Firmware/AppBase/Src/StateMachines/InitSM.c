@@ -42,7 +42,7 @@
 //#include "Libraries/NFC.h"
 
 /* Driver includes */
-#if (EN_NFC == 1)
+#if (EN_ST25DV == 1)
    #include "ST25DV/ST25DV.h"
 #endif
 

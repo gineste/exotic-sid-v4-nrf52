@@ -396,7 +396,7 @@ static void vIsReadyToRead(void * p_vContext)
    
    do{
       nrf_delay_ms(DELAY_WR_N_RD);
-      l_u32PinState = u32Hal_GPIO_Read(INT_CC);
+      l_u32PinState = u32Hal_GPIO_Read(IRQ_CC);
       l_u8Retry--;
    }while((l_u32PinState == 1u) && (l_u8Retry > 0u));
    __nop();

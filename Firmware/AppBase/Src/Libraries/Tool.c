@@ -260,7 +260,7 @@ void vTool_EncodeGPSPosition(double p_dLatitude, double p_dLongitude, char p_chL
          l_u8LatSign = 1u;
       }
 
-      if ( p_chLonEW < 'E' )
+      if ( p_chLonEW == 'W' )
       {
          l_u8LngSign = 1u;
       }

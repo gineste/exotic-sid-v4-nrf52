@@ -49,6 +49,9 @@
 #if (EN_RFID == 1)
    #include "AS3933/AS3933.h"
 #endif
+#if (EN_ST25DV == 1)
+   #include "ST25DV/ST25DV.h"
+#endif
 
 /* Application include */
 #include "ES_Commands.h"
@@ -154,7 +157,19 @@ static s_LIS2MDL_Context_t g_sLIS2MDLContext = {
    };
 #endif
 
-#
+#if (EN_ST25DV == 1)
+static s_ST25DV_Context_t g_sST25DVContext = {
+      /* Function pointer for a read I2C transfer */
+      .fp_u32I2C_Write = &u32Hal_I2C_Write,
+      /* Function pointer for a write I2C transfer */
+      .fp_u32I2C_Read = &u32Hal_I2C_WriteAndReadNoStop,
+      /* Function pointer to a timer in ms */
+      .fp_vDelay_ms = &vHal_Timer_DelayMs,
+      /* Config */
+      .eEepromSize = ST25DV_EEPROM_SIZE_64K,
+   };
+#endif
+   
 static const s_SensorManagement_t g_cafpvSensorsMngt[SENSOR_MNGR_NUMBERS] = {
    /*Shutdown,                         WakeUp,                       DataUpdate */
    #if (EN_BME280 == 1)
@@ -459,6 +474,13 @@ static void vInitnSleepAllSensors(void)
    }
 #endif
 
+#if (EN_ST25DV == 1)
+   if(eST25DV_ContextSet(g_sST25DVContext) == ST25DV_ERROR_NONE)
+   {
+      /* Config GPO as Interrupt Pin */
+   }
+#endif
+   
 #if (EN_RFID == 1)
    vAS3933_SPIContextSet();
    (void)eAS3933_Init();

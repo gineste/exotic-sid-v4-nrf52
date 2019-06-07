@@ -39,6 +39,11 @@
 #ifndef EN_LIS2MDL
 #define EN_LIS2MDL 1
 #endif
+// <q> ST25DV Present
+// <i> The ST25DV IC is an NFC/EEPROM component.
+#ifndef EN_ST25DV
+#define EN_ST25DV 1
+#endif
 // <q> Battery Measurement
 #ifndef EN_BATT
 #define EN_BATT 1
@@ -136,7 +141,7 @@
 // <e> Enable LOG
 // <i> EN_LOG
 #ifndef EN_LOG
-#define EN_LOG 0
+#define EN_LOG 1
 #endif
 // <q> Log BLE Transmit
 // <i> LOG_BLE_TX

@@ -17,6 +17,7 @@
  * Include Files
  ****************************************************************************************/
 #include <app_timer.h>
+#include <nrf_delay.h>
 
 /****************************************************************************************
  * Defines
@@ -52,8 +53,25 @@ e_HalTimerErrorCode_t eHal_Timer_Create(const s_HalTimerId_t * p_psTimerID, e_Ha
 e_HalTimerErrorCode_t eHal_Timer_Start(s_HalTimerId_t p_sTimerID, uint32_t p_u32TimeOutMs);
 e_HalTimerErrorCode_t eHal_Timer_Stop(s_HalTimerId_t p_sTimerID);
 e_HalTimerErrorCode_t eHal_Timer_StopAll(void);
-uint32_t u32Hal_Timer_GetTicks(void);
-void vHal_Timer_DelayMs(uint32_t p_u32DelayMs);
+__STATIC_INLINE uint32_t u32Hal_Timer_GetTicks(void);
+__STATIC_INLINE uint32_t u32Hal_Timer_GetTickDiff(uint32_t p_u32TickStart, uint32_t p_u32TickEnd);
+__STATIC_INLINE void vHal_Timer_DelayMs(uint32_t p_u32DelayMs);
+
+/************************************************************************
+ * Inline Public functions
+ ************************************************************************/
+__STATIC_INLINE uint32_t u32Hal_Timer_GetTicks(void)
+{
+   return app_timer_cnt_get();
+}
+__STATIC_INLINE uint32_t u32Hal_Timer_GetTickDiff(uint32_t p_u32TickStart, uint32_t p_u32TickEnd)
+{
+   return app_timer_cnt_diff_compute(p_u32TickEnd, p_u32TickStart);
+}
+__STATIC_INLINE void vHal_Timer_DelayMs(uint32_t p_u32DelayMs)
+{
+   nrf_delay_ms(p_u32DelayMs);
+}
 
 #endif /* HAL_TIMER_H */
 

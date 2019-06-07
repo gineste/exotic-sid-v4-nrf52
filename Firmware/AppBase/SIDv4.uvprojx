@@ -505,6 +505,11 @@
               <FileType>1</FileType>
               <FilePath>.\Src\Drivers\Battery\Battery.c</FilePath>
             </File>
+            <File>
+              <FileName>ST25DV.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\Drivers\ST25DV\ST25DV.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1456,6 +1461,11 @@
               <FileName>Battery.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Src\Drivers\Battery\Battery.c</FilePath>
+            </File>
+            <File>
+              <FileName>ST25DV.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Src\Drivers\ST25DV\ST25DV.c</FilePath>
             </File>
           </Files>
         </Group>

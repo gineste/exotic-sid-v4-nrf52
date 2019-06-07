@@ -19,7 +19,7 @@
  * Include Files
  ****************************************************************************************/
 #include <stdint.h>
-#include <nrf_delay.h>
+
 #include "HAL_Timer.h"
 
 /****************************************************************************************
@@ -123,20 +123,6 @@ e_HalTimerErrorCode_t eHal_Timer_StopAll(void)
    }
    
    return l_eErrCode;
-}
-
-uint32_t u32Hal_Timer_GetTicks(void)
-{
-   uint32_t l_u32Ticks = 0u;
-   
-   l_u32Ticks = app_timer_cnt_get();
-   
-   return l_u32Ticks;
-}
-
-void vHal_Timer_DelayMs(uint32_t p_u32DelayMs)
-{
-   nrf_delay_ms(p_u32DelayMs);
 }
 
 /****************************************************************************************
