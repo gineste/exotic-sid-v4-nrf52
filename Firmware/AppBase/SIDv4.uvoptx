@@ -182,7 +182,7 @@
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>460</LineNumber>
+          <LineNumber>265</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -191,7 +191,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>&lt;1&gt;.\Src\Application\FrameBuilder.c</Filename>
+          <Filename>&lt;1&gt;.\Src\BLE\BLE_Application.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -377,18 +377,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>460</LineNumber>
+          <LineNumber>265</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>199674</Address>
+          <Address>202482</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>&lt;1&gt;.\Src\Application\FrameBuilder.c</Filename>
+          <Filename>&lt;1&gt;.\Src\BLE\BLE_Application.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\SIDv4Debug\Src/Application/FrameBuilder.c\460</Expression>
+          <Expression>\\SIDv4Debug\Src/BLE/BLE_Application.c\265</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -431,6 +431,36 @@
           <count>7</count>
           <WinNumber>1</WinNumber>
           <ItemText>l_as16Temp</ItemText>
+        </Ww>
+        <Ww>
+          <count>8</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>l_au8Payload</ItemText>
+        </Ww>
+        <Ww>
+          <count>9</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>g_sSrAdvData</ItemText>
+        </Ww>
+        <Ww>
+          <count>10</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>g_au8SrAdvData</ItemText>
+        </Ww>
+        <Ww>
+          <count>11</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>p_pu8Data</ItemText>
+        </Ww>
+        <Ww>
+          <count>12</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>p_u8Size</ItemText>
+        </Ww>
+        <Ww>
+          <count>13</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>g_u8SizeSrAdvData</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
@@ -684,7 +714,7 @@
 
   <Group>
     <GroupName>Config</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

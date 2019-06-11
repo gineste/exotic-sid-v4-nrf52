@@ -443,21 +443,15 @@ static uint8_t u8Frame_BuildCmdAngle(uint8_t * p_pau8Buffer)
    l_as16Temp[2u] = (int16_t)U8_TO_U16(l_au8Buffer[4u],l_au8Buffer[5u]);   /* Z */   
    
    p_pau8Buffer[l_u8Size++] |= (uint8_t)((l_as16Temp[0u] & 0xFF00) >> 8u);       /* Accel X MSB */
-   
-   /* Accel X LSB Byte 3 */
    p_pau8Buffer[l_u8Size++] = (uint8_t)(l_as16Temp[0u] & 0x00FF);                /* Accel X LSB */
-   
-   /* Accel Y MSB Byte 4 */
-   p_pau8Buffer[l_u8Size++] = (uint8_t)((l_as16Temp[1u] & 0xFF00) >> 8u);        /* Accel Y MSB */
-   
-   /* Accel Y LSB & Z MSB Byte 5 */
-   p_pau8Buffer[l_u8Size] = (uint8_t)((l_as16Temp[1u] & 0x00FF) << 8u);          /* Accel Y LSB */
-   p_pau8Buffer[l_u8Size++] |= (uint8_t)((l_as16Temp[2u] & 0xFF00) >> 8u);       /* Accel Z MSB */   
-   
-   /* Accel Z LSB Byte 6 */
+	 
+	 p_pau8Buffer[l_u8Size++] |= (uint8_t)((l_as16Temp[1u] & 0xFF00) >> 8u);       /* Accel Y MSB */
+   p_pau8Buffer[l_u8Size++] = (uint8_t)(l_as16Temp[1u] & 0x00FF);                /* Accel Y LSB */
+	 
+	 p_pau8Buffer[l_u8Size++] |= (uint8_t)((l_as16Temp[2u] & 0xFF00) >> 8u);       /* Accel Z MSB */
    p_pau8Buffer[l_u8Size++] = (uint8_t)(l_as16Temp[2u] & 0x00FF);                /* Accel Z LSB */
 	 
-	 return 7;
+	 return l_u8Size;
 }
 
 /****************************************************************************************

@@ -95,12 +95,12 @@
 // <s> Default Prefix BLE Name
 // <i> Always start with PREFIX "SF_" - DEFAULT_PREFIX_BLE_DEVICE_NAME
 #ifndef DEFAULT_PREFIX_BLE_DEVICE_NAME
-#define DEFAULT_PREFIX_BLE_DEVICE_NAME "SF_"
+#define DEFAULT_PREFIX_BLE_DEVICE_NAME ""
 #endif
 // <s> Default BLE Name
 // <i> DEFAULT_BLE_DEVICE_NAME
 #ifndef DEFAULT_BLE_DEVICE_NAME
-#define DEFAULT_BLE_DEVICE_NAME "SIDv4"
+#define DEFAULT_BLE_DEVICE_NAME "SID"
 #endif
 // </e> BLE DISABLED
 // </h> 
