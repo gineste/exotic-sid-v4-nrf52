@@ -36,6 +36,7 @@ typedef enum _FRAME_MNGR_CMD_ {
    FRAME_BLD_CMD_GENERIC,
    FRAME_BLD_CMD_MOTION_DATA,
    FRAME_BLD_CMD_STATUS,
+   FRAME_BLD_CMD_ANGLE,
    FRAME_BLD_CMD_MAX   
 }e_FrameBuilder_Command_t;
 

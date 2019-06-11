@@ -68,6 +68,7 @@ static uint8_t u8Frame_BuildCmdBLE(uint8_t * p_pu8Buffer);
 static uint8_t u8Frame_BuildCmdOne(uint8_t * p_pu8Buffer);
 static uint8_t u8Frame_BuildCmdTwo(uint8_t * p_pu8Buffer);
 static uint8_t u8Frame_BuildCmdThree(uint8_t * p_pu8Buffer);
+static uint8_t u8Frame_BuildCmdAngle(uint8_t * p_pau8Buffer);
 
 static void vGetMACAddress(uint8_t * p_pu8Data, uint8_t * p_pu8Size);
 static void vGetSensorData(e_DataSensorsIdx_t p_eDataSensorID, uint8_t * p_pu8Data, uint8_t * p_pu8Size);
@@ -172,6 +173,9 @@ e_FrameBuilder_Error_t eFrameBuilder_PayloadGet(uint8_t p_u8Command, uint8_t * p
          break;
          case FRAME_BLD_CMD_STATUS:
             l_u8FrameSize = u8Frame_BuildCmdThree(p_pu8Payload);
+         break;
+				 case FRAME_BLD_CMD_ANGLE:
+            l_u8FrameSize = u8Frame_BuildCmdAngle(p_pu8Payload);
          break;
          default:
             break;
@@ -422,6 +426,38 @@ static void vGetSensorData(e_DataSensorsIdx_t p_eDataSensorID, uint8_t * p_pu8Da
          (*g_cafpvSensorsDataGet[(uint8_t)p_eDataSensorID])(p_pu8Data, p_pu8Size);
       }
    }
+}
+
+static uint8_t u8Frame_BuildCmdAngle(uint8_t * p_pau8Buffer) 
+{
+   uint8_t l_au8Buffer[8u] =  { 0u };
+   int16_t l_as16Temp[3u] = { 0 };
+	 uint8_t l_u8Size = 0u;
+   uint8_t l_u8GetSize = 0u;
+	 
+	 p_pau8Buffer[l_u8Size++] = 0x20; // DataId Accelerometer
+	 
+	 vGetSensorData(DATA_ACCEL_IDX, l_au8Buffer, &l_u8GetSize);
+   l_as16Temp[0u] = (int16_t)U8_TO_U16(l_au8Buffer[0u],l_au8Buffer[1u]);   /* X */
+   l_as16Temp[1u] = (int16_t)U8_TO_U16(l_au8Buffer[2u],l_au8Buffer[3u]);   /* Y */
+   l_as16Temp[2u] = (int16_t)U8_TO_U16(l_au8Buffer[4u],l_au8Buffer[5u]);   /* Z */   
+   
+   p_pau8Buffer[l_u8Size++] |= (uint8_t)((l_as16Temp[0u] & 0xFF00) >> 8u);       /* Accel X MSB */
+   
+   /* Accel X LSB Byte 3 */
+   p_pau8Buffer[l_u8Size++] = (uint8_t)(l_as16Temp[0u] & 0x00FF);                /* Accel X LSB */
+   
+   /* Accel Y MSB Byte 4 */
+   p_pau8Buffer[l_u8Size++] = (uint8_t)((l_as16Temp[1u] & 0xFF00) >> 8u);        /* Accel Y MSB */
+   
+   /* Accel Y LSB & Z MSB Byte 5 */
+   p_pau8Buffer[l_u8Size] = (uint8_t)((l_as16Temp[1u] & 0x00FF) << 8u);          /* Accel Y LSB */
+   p_pau8Buffer[l_u8Size++] |= (uint8_t)((l_as16Temp[2u] & 0xFF00) >> 8u);       /* Accel Z MSB */   
+   
+   /* Accel Z LSB Byte 6 */
+   p_pau8Buffer[l_u8Size++] = (uint8_t)(l_as16Temp[2u] & 0x00FF);                /* Accel Z LSB */
+	 
+	 return 7;
 }
 
 /****************************************************************************************

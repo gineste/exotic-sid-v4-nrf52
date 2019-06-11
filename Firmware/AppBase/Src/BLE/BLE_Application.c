@@ -22,9 +22,12 @@
 #include <stdint.h>
 #include <string.h>
 
+/* Config includes */
 #include "BoardConfig.h"
 #include "GlobalDefs.h"
+#include "sdk_config.h"
 
+/* SDK includes */
 #include "nordic_common.h"
 #include "nrf.h"
 #include "app_error.h"
@@ -34,15 +37,10 @@
 #include "ble_advdata.h"
 #include "ble_advertising.h"
 #include "ble_conn_params.h"
-#include "ble_radio_notification.h"
+//#include "ble_radio_notification.h"
 #include "nrf_sdh.h"
 #include "nrf_sdh_soc.h"
 #include "nrf_sdh_ble.h"
-
-/* BLE Includes */
-#include "BLE/BLE_Uart.h"
-#include "BLE/BLE_Service.h"
-#include "BLE/BT_Interface.h"
 
 #include "fds.h"
 #include "peer_manager.h"
@@ -54,13 +52,16 @@
    #include "nrf_pwr_mgmt.h"
 #endif
 
-/* HAL Includes */
+/* Application BLE includes */
+#include "BLE/BLE_Uart.h"
+#include "BLE/BLE_Service.h"
+#include "BLE/BT_Interface.h"
+
+/* HAL include */
 #include "HAL/HAL_Timer.h"
 
-#include "sdk_config.h"
+#include "ES_OpCodes.h"
 
-#include "MainStateMachine.h"
-//#include "MemoryInterface.h"
 #include "BLE_Application.h"
 
 /****************************************************************************************
@@ -68,23 +69,19 @@
  ****************************************************************************************/
 #define APP_FEATURE_NOT_SUPPORTED       BLE_GATT_STATUS_ATTERR_APP_BEGIN + 2    /**< Reply when unsupported features are requested. */
 /**< Name of device. Will be included in the advertising data. */
-#define DEVICE_NAME                     CONCAT_2(DEFAULT_PREFIX_BLE_DEVICE_NAME,DEFAULT_BLE_DEVICE_NAME)
+#define DEVICE_NAME                     CONCAT_STRG_2(DEFAULT_PREFIX_BLE_DEVICE_NAME,DEFAULT_BLE_DEVICE_NAME)
 
-#define ADV_DATA_SIZE                   ((uint8_t)31u)
+#define ADV_DATA_SIZE                   ((uint8_t)BLE_GAP_ADV_MAX_SIZE)
 #define MANUFACTURER_NAME               "Exotic-Systems"                         /**< Manufacturer. Will be passed to Device Information Service. */
+#define MANUFACTURER_ID                 (uint16_t)0x071D                         /**< exoTIC Systems Manufacturer ID */
 #define BLE_TX_POWER                    ((int8_t)(-8))                           /**< TX Power Level value. This will be set both in the TX Power service, in the advertising data, and also used to set the radio transmit power. */
 
-#ifdef DEBUG
-   #define APP_ADV_FAST_INTERVAL           80    
-   #define APP_ADV_SLOW_INTERVAL           800   
-#else
-   #define APP_ADV_FAST_INTERVAL           FAST_ADV_INT_BLE_COMP                 /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
-   #define APP_ADV_SLOW_INTERVAL           SLOW_ADV_INT_BLE_COMP                 /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
-#endif
+#define APP_ADV_FAST_INTERVAL           FAST_ADV_INT_BLE_COMP                 /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
+#define APP_ADV_SLOW_INTERVAL           SLOW_ADV_INT_BLE_COMP                 /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
-#define APP_ADV_FAST_TIMEOUT_IN_SECONDS FAST_ADV_TIMEOUT_BLE                     /**< The advertising timeout in units of seconds. */
-#define APP_ADV_SLOW_TIMEOUT_IN_SECONDS SLOW_ADV_TIMEOUT_BLE                     /**< The advertising timeout in units of seconds. */
-   
+#define APP_ADV_FAST_TIMEOUT_IN_SECONDS FAST_ADV_TIMEOUT_BLE                  /**< The advertising timeout in units of seconds. */
+#define APP_ADV_SLOW_TIMEOUT_IN_SECONDS SLOW_ADV_TIMEOUT_BLE                  /**< The advertising timeout in units of seconds. */
+
 #define APP_BLE_OBSERVER_PRIO           1                                        /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG            1                                        /**< A tag identifying the SoftDevice BLE configuration. */
 
@@ -128,7 +125,6 @@ static void vGattInit(void);
 static void vServicesInit(void);
 static void vAdvertisingStart(bool p_bEraseBonds);
 static void vDeleteBonds(void);
-static void vBleNotificationRadio(bool p_bRadioEvt);
 
 #if (BLE_DFU_ENABLED == 1)
    static void vOnBleDFUEvtHandler(ble_dfu_buttonless_evt_type_t p_sDFUEvent);
@@ -152,22 +148,29 @@ static
 #endif
 char g_achBleDeviceName[DEVICE_NAME_SIZE_MAX] = { 0 }; 
 static ble_advdata_t g_sAdvData;
+static ble_advdata_t g_sSrAdvData;
 #ifndef DEBUG
 static 
 #endif
 uint8_t g_au8AdvData[ADV_DATA_SIZE_MAX] = { 0u };
-static uint8_t g_u8SizeAdvData = 0u;
-static bool g_bHasToSetAdvertise = false;
+#ifndef DEBUG
+static 
+#endif
+uint8_t g_au8SrAdvData[ADV_INFO_SIZE] = { 0u };
+static uint8_t g_u8SizeSrAdvData = 0u;
 
 /* TODO Remove Last BleEvent and register as Observer with low priority instead */
-static e_Ble_Event_t g_LastBleEvent = BLE_EVENT_INIT;
+#ifndef DEBUG
+static 
+#endif
+e_Ble_Event_t g_LastBleEvent = BLE_EVENT_INIT;
 static e_Ble_Adv_State_t g_eAdvState = BLE_ADV_EVT_IDLE;
 static uint16_t g_u16ConnHandle = BLE_CONN_HANDLE_INVALID;                    /**< Handle of the current connection. */
 // YOUR_JOB: Use UUIDs for service(s) used in your application.
-static ble_uuid_t m_adv_uuids[] =                                             /**< Universally unique service identifiers. */
-{
-    {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}
-};
+//static ble_uuid_t g_adv_uuids[] =                                             /**< Universally unique service identifiers. */
+//{
+//    {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}
+//};
 
 /****************************************************************************************
  * Public functions
@@ -202,37 +205,11 @@ void vBLE_AdvertisingStart(e_Ble_Adv_Mode_t p_eAdvMode)
  */
 void vBLE_AdvertisingStop(void)
 {
-   if(g_eAdvState != BLE_ADV_MODE_IDLE)
+   if(g_eAdvState != (e_Ble_Adv_State_t)BLE_ADV_MODE_IDLE)
    {
       APP_ERROR_CHECK(sd_ble_gap_adv_stop());
    }
 }
-
-/**@brief Function for handling the YYY Service events.
- * YOUR_JOB implement a service handler function depending on the event the service you are using can generate
- *
- * @details This function will be called for all YY Service events which are passed to
- *          the application.
- *
- * @param[in]   p_yy_service   YY Service structure.
- * @param[in]   p_evt          Event received from the YY Service.
- *
- *
-static void on_yys_evt(ble_yy_service_t     * p_yy_service,
-                       ble_yy_service_evt_t * p_evt)
-{
-    switch (p_evt->evt_type)
-    {
-        case BLE_YY_NAME_EVT_WRITE:
-            APPL_LOG("[APPL]: charact written with value %s. ", p_evt->params.char_xx.value.p_str);
-            break;
-
-        default:
-            // No implementation needed.
-            break;
-    }
-}
-*/
 
 /**@brief Function for putting the chip into sleep mode.
  *
@@ -260,37 +237,67 @@ void vBLE_SoftDeviceDisable(void)
 {
    APP_ERROR_CHECK(nrf_sdh_disable_request());
 }
+void vBLE_SrAdvDataInit(uint8_t * p_pu8Data, uint8_t p_u8Size)
+{
+
+}
+void vBLE_SrAdvDataUpdate(uint8_t * p_pu8Data, uint8_t p_u8Size)
+{
+   uint32_t l_u32ErrCode = 0u;
+   
+   ble_advdata_manuf_data_t l_sDataResponse;
+   
+   if( (p_u8Size < SR_ADV_DATA_SIZE_MAX) && (p_pu8Data != NULL) )
+   {
+      /* Copy Data */
+      g_au8SrAdvData[0u] = BOARD_TYPE;
+      g_au8SrAdvData[1u] = USE_CASE_NUMBER;
+      memcpy(&g_au8SrAdvData[2u], p_pu8Data, p_u8Size);
+      /* Compute Size */
+      g_u8SizeSrAdvData = p_u8Size + 2u;
+      
+      l_sDataResponse.company_identifier = MANUFACTURER_ID;
+      l_sDataResponse.data.p_data = g_au8SrAdvData;
+      l_sDataResponse.data.size = g_u8SizeSrAdvData;      
+
+      g_sSrAdvData.p_manuf_specific_data = &l_sDataResponse;
+      
+      if((g_LastBleEvent == BLE_EVENT_DISCONNECTED) || (g_LastBleEvent == BLE_EVENT_INIT))
+      {
+         l_u32ErrCode = ble_advdata_set(&g_sAdvData, &g_sSrAdvData);
+      }
+
+      //l_u32ErrCode = sd_ble_gap_adv_data_set(NULL, 0, l_au8SrAdvResp, l_au8SrAdvResp[0u]);
+      APP_ERROR_CHECK(l_u32ErrCode);
+   }
+}
 void vBLE_AdvDataUpdate(uint8_t * p_pu8Data, uint8_t p_u8Size)
-{   
+{
    uint8_t l_u8Size = 0u;
    uint8_t l_u8NameSize = 0u;
    
    memset(g_au8AdvData, 0u, sizeof(g_au8AdvData));
    /* Size Check */
    l_u8Size = (p_u8Size > ADV_SENS_DATA_SIZE)? ADV_SENS_DATA_SIZE: p_u8Size;
-   /* Size of Advertise data (+4 for Manufacturer specific) */
-   g_au8AdvData[0u] = l_u8Size + 4u;
+   /* Size of Advertise data (+5 for Manufacturer specific) */
+   g_au8AdvData[0u] = l_u8Size + 5u;
    
    g_au8AdvData[1u] = BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA;
-   g_au8AdvData[2u] = 0x59; /* Nordic ID */
-   g_au8AdvData[3u] = 0x00;
+   g_au8AdvData[2u] = LSB_16B_TO_8B(MANUFACTURER_ID);
+   g_au8AdvData[3u] = MSB_16B_TO_8B(MANUFACTURER_ID);
    /* Device Type (1: SF, 2: DL, 3: SID) */
    g_au8AdvData[4u] = BOARD_TYPE;
+   /* Use Case */
+   g_au8AdvData[5u] = USE_CASE_NUMBER;
 
    /* Our custom data to advertise */   
-   memcpy(&g_au8AdvData[5u], p_pu8Data, l_u8Size);
+   memcpy(&g_au8AdvData[6u], p_pu8Data, l_u8Size);
    /* Size Check */
    l_u8NameSize = ((strlen(g_achBleDeviceName) + 1u) > DEVICE_NAME_SIZE_MAX)? DEVICE_NAME_SIZE_MAX: (strlen(g_achBleDeviceName) + 1u);
-   g_au8AdvData[5u+l_u8Size] = l_u8NameSize + 1u;
-   g_au8AdvData[6u+l_u8Size] = BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME;
    
-   //l_u8Size = (strlen(g_achBleDeviceName) + p_u8Size + 7u) > ADV_DATA_SIZE_MAX? (ADV_DATA_SIZE_MAX - (p_u8Size + 7u)):strlen(g_achBleDeviceName);
-   
-   memcpy(&g_au8AdvData[7u+l_u8Size], g_achBleDeviceName, l_u8NameSize);
-   
-   g_u8SizeAdvData = 7u + l_u8Size + l_u8NameSize;   
-   
-   g_bHasToSetAdvertise = true;
+   g_au8SrAdvData[0u] = l_u8NameSize + 1u; 
+   g_au8SrAdvData[1u] = BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME;
+   memcpy(&g_au8SrAdvData[2u], g_achBleDeviceName, l_u8NameSize);
 }
 
 void vBLE_UpdateName(char * p_chDeviceName, uint8_t p_u8Size)
@@ -298,24 +305,25 @@ void vBLE_UpdateName(char * p_chDeviceName, uint8_t p_u8Size)
 	uint32_t l_u32ErrCode = 0u;
    uint8_t l_u8NameSize = 0u;
    ble_gap_conn_sec_mode_t	l_sSecMode;
-		
-	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&l_sSecMode);
-   memset(g_achBleDeviceName, 0u, DEVICE_NAME_SIZE_MAX);
-   l_u8NameSize = (p_u8Size > DEVICE_NAME_SIZE_MAX)?DEVICE_NAME_SIZE_MAX:p_u8Size;
-   memcpy(g_achBleDeviceName, p_chDeviceName, l_u8NameSize);
-	l_u32ErrCode = sd_ble_gap_device_name_set(&l_sSecMode, (const uint8_t *)p_chDeviceName, l_u8NameSize);
-	APP_ERROR_CHECK(l_u32ErrCode);
-   l_u32ErrCode = ble_advdata_set(&g_sAdvData, NULL);
-   APP_ERROR_CHECK(l_u32ErrCode);
    
-   PRINT_INFO("%s","Updated Board Name : ");
-   PRINT_GREEN("%s\n", g_achBleDeviceName);
+   if(strncmp(p_chDeviceName, DEFAULT_PREFIX_BLE_DEVICE_NAME, strlen(DEFAULT_PREFIX_BLE_DEVICE_NAME)) == 0)
+   {      
+      memset(g_achBleDeviceName, 0u, DEVICE_NAME_SIZE_MAX);
+      l_u8NameSize = (p_u8Size > DEVICE_NAME_SIZE_MAX)?DEVICE_NAME_SIZE_MAX:p_u8Size;
+      memcpy(g_achBleDeviceName, p_chDeviceName, l_u8NameSize);
+         
+      BLE_GAP_CONN_SEC_MODE_SET_OPEN(&l_sSecMode);
+      l_u32ErrCode = sd_ble_gap_device_name_set(&l_sSecMode, (const uint8_t *)p_chDeviceName, l_u8NameSize);
+      APP_ERROR_CHECK(l_u32ErrCode);
+	  
+      PRINT_INFO("%s","Updated Board Name : ");
+      PRINT_GREEN("%s\n", g_achBleDeviceName);
+   }
 }
 
 /****************************************************************************************
  * Private functions
  ****************************************************************************************/
-
 /**@brief Function for handling advertising events.
  *
  * @details This function will be called for advertising events which are passed to the application.
@@ -495,7 +503,7 @@ static void vBleEvtHandler(ble_evt_t const * p_ble_evt, void * p_context)
          break;
       
       case BLE_GAP_EVT_DISCONNECTED:
-         g_LastBleEvent = BLE_EVENT_DISCONNECTED;     
+         g_LastBleEvent = BLE_EVENT_DISCONNECTED;
          g_u16ConnHandle = BLE_CONN_HANDLE_INVALID;
          break;
    #if defined(S132)
@@ -516,6 +524,7 @@ static void vBleEvtHandler(ble_evt_t const * p_ble_evt, void * p_context)
          l_u32ErrCode = sd_ble_gap_disconnect(p_ble_evt->evt.gattc_evt.conn_handle,
                                        BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
          APP_ERROR_CHECK(l_u32ErrCode);
+         g_LastBleEvent = BLE_EVENT_DISCONNECTED;
       break;
 
       case BLE_GATTS_EVT_TIMEOUT:
@@ -523,6 +532,7 @@ static void vBleEvtHandler(ble_evt_t const * p_ble_evt, void * p_context)
          l_u32ErrCode = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle,
                                        BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
          APP_ERROR_CHECK(l_u32ErrCode);
+         g_LastBleEvent = BLE_EVENT_DISCONNECTED;
       break;
 
       case BLE_EVT_USER_MEM_REQUEST:
@@ -558,6 +568,12 @@ static void vBleEvtHandler(ble_evt_t const * p_ble_evt, void * p_context)
          }
       } break; // BLE_GATTS_EVT_RW_AUTHORIZE_REQUEST
 
+      
+      case BLE_GAP_EVT_SCAN_REQ_REPORT:
+      break;
+      case BLE_GAP_EVT_ADV_REPORT:
+      break;
+      
       default:
       // No implementation needed.
       break;
@@ -622,11 +638,21 @@ static void vAdvertisingInit(void)
    // Build and set advertising data
    memset(&g_sAdvData, 0, sizeof(ble_advdata_t));
 
-   l_sInit.advdata.name_type               = BLE_ADVDATA_FULL_NAME;
-   l_sInit.advdata.include_appearance      = true;
+   l_sInit.advdata.name_type               = BLE_ADVDATA_SHORT_NAME;
+   l_sInit.advdata.short_name_len          = 7u;
+   l_sInit.advdata.include_appearance      = false;
    l_sInit.advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-   l_sInit.advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
-   l_sInit.advdata.uuids_complete.p_uuids  = m_adv_uuids;
+   //l_sInit.advdata.uuids_complete.uuid_cnt = sizeof(g_adv_uuids) / sizeof(g_adv_uuids[0]);
+   //l_sInit.advdata.uuids_complete.p_uuids  = g_adv_uuids;
+   
+   ble_advdata_manuf_data_t l_sManufDataResponse;
+   l_sInit.srdata.name_type = BLE_ADVDATA_NO_NAME;
+   l_sManufDataResponse.company_identifier = MANUFACTURER_ID;
+   l_sManufDataResponse.data.p_data = g_au8SrAdvData;
+   l_sManufDataResponse.data.size = ADV_INFO_SIZE;//SR_ADV_DATA_SIZE_MAX;
+   
+   l_sInit.srdata.p_manuf_specific_data = &l_sManufDataResponse;   
+   
 #if (ENABLE_BLE == 1)
    l_sInit.config.ble_adv_fast_enabled  = true;
    l_sInit.config.ble_adv_slow_enabled  = true;   
@@ -646,12 +672,11 @@ static void vAdvertisingInit(void)
    l_sInit.evt_handler = vOnAdvEvt;
    
    g_sAdvData = l_sInit.advdata;
+   g_sSrAdvData = l_sInit.srdata;
    
    l_u32ErrCode = ble_advertising_init(&g_AdvertisingInstance, &l_sInit);
    APP_ERROR_CHECK(l_u32ErrCode);
    
-   g_bHasToSetAdvertise = false;
-
    ble_advertising_conn_cfg_tag_set(&g_AdvertisingInstance, APP_BLE_CONN_CFG_TAG);
 }
 
@@ -688,10 +713,6 @@ static void vBleStackInit(void)
 
    l_u32ErrCode = nrf_sdh_enable_request();
    APP_ERROR_CHECK(l_u32ErrCode);
-
-   /* Fix issue on radio notification */
-   l_u32ErrCode = ble_radio_notification_init(APP_IRQ_PRIORITY_LOW, NRF_RADIO_NOTIFICATION_DISTANCE_5500US, vBleNotificationRadio);
-   APP_ERROR_CHECK(l_u32ErrCode);   
    
    // Configure the BLE stack using the default settings.
    // Fetch the start address of the application RAM.
@@ -702,7 +723,7 @@ static void vBleStackInit(void)
    APP_ERROR_CHECK(l_u32ErrCode);
    
    // Register a handler for BLE events.
-   NRF_SDH_BLE_OBSERVER(g_BLE_Template_Observer, APP_BLE_OBSERVER_PRIO, vBleEvtHandler, NULL);   
+   NRF_SDH_BLE_OBSERVER(g_BLE_Template_Observer, APP_BLE_OBSERVER_PRIO, vBleEvtHandler, NULL);
 }
 
 /**@brief Function for the GAP initialization.
@@ -742,8 +763,8 @@ static void vGapParamsInit(void)
    /* YOUR_JOB: Use an appearance value matching the application's use case.
     err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_);
     APP_ERROR_CHECK(err_code); */
-   l_u32ErrCode = sd_ble_gap_appearance_set(BLE_APPEARANCE_GENERIC_TAG);
-   APP_ERROR_CHECK(l_u32ErrCode);
+//   l_u32ErrCode = sd_ble_gap_appearance_set(BLE_APPEARANCE_GENERIC_TAG);
+//   APP_ERROR_CHECK(l_u32ErrCode);
 
    memset(&l_sGapConnParams, 0, sizeof(l_sGapConnParams));
 
@@ -851,19 +872,6 @@ static void vDeleteBonds(void)
 
    l_u32ErrCode = pm_peers_delete();
    APP_ERROR_CHECK(l_u32ErrCode);
-}
-/**@brief Notify on Radio update.
- */
-static void vBleNotificationRadio(bool p_bRadioEvt)
-{
-   if(   (p_bRadioEvt == true) 
-      && (g_bHasToSetAdvertise == true) ) 
-   { 
-      (void)sd_ble_gap_adv_data_set(g_au8AdvData, g_u8SizeAdvData, NULL, 0);
-      g_bHasToSetAdvertise = false;
-   }
-   else 
-   {  /* Nothing to do */  }
 }
 
 #if (BLE_DFU_ENABLED == 1)
@@ -983,5 +991,3 @@ static void vBleUartEvtHandler(s_Ble_Service_Evt_t * p_psEvt)
 /****************************************************************************************
  * End Of File
  ****************************************************************************************/
- 
-

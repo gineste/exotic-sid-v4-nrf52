@@ -24,10 +24,13 @@
 /****************************************************************************************
  * Defines
  ****************************************************************************************/
-#define ADV_DATA_SIZE_MAX                 BLE_GAP_ADV_MAX_SIZE /* -> 31 for BLE 4.2, 255 for BLE 5.0 */
+#define ADV_DATA_SIZE_MAX                 (BLE_GAP_ADV_MAX_SIZE)        /* -> 31 for BLE 4.2, 255 for BLE 5.0 */
+#define SR_ADV_DATA_SIZE_MAX              (BLE_GAP_ADV_MAX_SIZE - 3u)   /* -> 31 for BLE 4.2, 255 for BLE 5.0 */
 #define ADV_SENS_DATA_SIZE                ((uint8_t)5u)
-#define ADV_INFO_SIZE                     ((uint8_t)6u)
+#define ADV_INFO_SIZE                     ((uint8_t)7u)
 #define DEVICE_NAME_SIZE_MAX              (uint8_t)(ADV_DATA_SIZE_MAX - ADV_SENS_DATA_SIZE - ADV_INFO_SIZE - 1u)/* -1 for end char */
+
+#define CONCAT_STRG_2(strg1,strg2)     strg1""strg2
 
 /****************************************************************************************
  * Type definitions
@@ -53,8 +56,9 @@ e_Ble_Event_t eBLE_EventGet(void);
 e_Ble_Adv_State_t eBLE_AdvertiseStateGet(void);
 void vBLE_SoftDeviceDisable(void);
 void vBLE_SleepModeEnter(void);
+void vBLE_SrAdvDataUpdate(uint8_t * p_pu8Data, uint8_t p_u8Size);
 void vBLE_AdvDataUpdate(uint8_t * p_pu8Data, uint8_t p_u8Size);
 void vBLE_UpdateName(char * p_chDeviceName, uint8_t p_u8Size);
-    
+
 #endif /* BLE_APPLICATION_H */
 

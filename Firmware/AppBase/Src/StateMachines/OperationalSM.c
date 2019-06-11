@@ -115,49 +115,47 @@ void vOperational_Entry(void)
  */
 void vOperational_Process(void)
 {   
-#if (EN_WAKEUP_ON_MOTION == 1)
+//#if (EN_WAKEUP_ON_MOTION == 1)
    static uint8_t l_u8DeviceInMotion = 0u;
-   e_FrameBuilder_Command_t l_eCfgCommand = FRAME_BLD_CMD_GENERIC;
+   //e_FrameBuilder_Command_t l_eCfgCommand = FRAME_BLD_CMD_GENERIC;
+	 e_FrameBuilder_Command_t l_eCfgCommand = FRAME_BLD_CMD_ANGLE;
    uint8_t l_au8Payload[20u] = { 0u };
    uint8_t l_u8Size = 0u;
-#endif
+//#endif
    
    if(u8MSM_CyclicProcessCheck() == 1u)
    {
-#if (EN_WAKEUP_ON_MOTION == 1)
+//#if (EN_WAKEUP_ON_MOTION == 1)
       //l_u8DeviceInMotion = u8LSM6DSL_IsAwake();
       
-      if(   (l_u8DeviceInMotion == 0u)
+      /*if(   (l_u8DeviceInMotion == 0u)
          && (g_u8DeviceInMotion == 1u) ) 
-      {
+      {*/
          /* Wake Up Sensors / Get Data / Shutdown Sensors */
          vSensorMngr_WakeUpSensor();   
          vSensorMngr_DataUpdate();
          vSensorMngr_ShutdownSensor();
          
          /* Send Data to CC430 */
-         vFrameBuilder_CfgGet(&l_eCfgCommand);
+         //vFrameBuilder_CfgGet(&l_eCfgCommand);
          
-         l_au8Payload[0u] = SID_TAG;   /* Only SID_TAG */
-         l_au8Payload[1u] = 0u;
-         
-         if(eFrameBuilder_PayloadGet((uint8_t)l_eCfgCommand, &l_au8Payload[2u], &l_u8Size) == FRAME_BLD_ERROR_NONE)
+         if(eFrameBuilder_PayloadGet((uint8_t)l_eCfgCommand, &l_au8Payload[0u], &l_u8Size) == FRAME_BLD_ERROR_NONE)
          {            
-            l_u8Size += 2u;
-            (void)eCC430_ITF_SendFrame(CMD_RF_TRANSMISSION, ES_HOST_NRF, ES_HOST_CC430, l_au8Payload, (uint16_t)l_u8Size);
+            //l_u8Size += 2u;
+            //(void)eCC430_ITF_SendFrame(CMD_RF_TRANSMISSION, ES_HOST_NRF, ES_HOST_CC430, l_au8Payload, (uint16_t)l_u8Size);
             
             /* Update Advertise data with corresponding command saved in flash */
-            vBLE_AdvDataUpdate(&l_au8Payload[2u], (l_u8Size-2u));            
+					  vBLE_SrAdvDataUpdate(l_au8Payload, l_u8Size);       
          }         
    
-         g_u8DeviceInMotion = l_u8DeviceInMotion;
-      }
+         //g_u8DeviceInMotion = l_u8DeviceInMotion;
+      /*}
       else if( (l_u8DeviceInMotion == 1u)
             && (g_u8DeviceInMotion == 0u) ) 
       {
          g_u8DeviceInMotion = l_u8DeviceInMotion;
-      }
-#endif
+      }*/
+//#endif
       vMSM_CyclicProcessClear();
    }
 }
