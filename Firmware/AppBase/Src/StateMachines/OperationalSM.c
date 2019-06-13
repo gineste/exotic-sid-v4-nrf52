@@ -116,7 +116,7 @@ void vOperational_Entry(void)
 void vOperational_Process(void)
 {   
 //#if (EN_WAKEUP_ON_MOTION == 1)
-   static uint8_t l_u8DeviceInMotion = 0u;
+   //static uint8_t l_u8DeviceInMotion = 0u;
    //e_FrameBuilder_Command_t l_eCfgCommand = FRAME_BLD_CMD_GENERIC;
 	 e_FrameBuilder_Command_t l_eCfgCommand = FRAME_BLD_CMD_ANGLE;
    uint8_t l_au8Payload[20u] = { 0u };

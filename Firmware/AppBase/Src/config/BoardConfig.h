@@ -42,7 +42,7 @@
 // <q> ST25DV Present
 // <i> The ST25DV IC is an NFC/EEPROM component.
 #ifndef EN_ST25DV
-#define EN_ST25DV 1
+#define EN_ST25DV 0
 #endif
 // <q> Battery Measurement
 #ifndef EN_BATT
@@ -68,13 +68,13 @@
 #endif
 // <o> Fast Advertise Interval - mseconds <10-1000:5>
 #ifndef FAST_ADV_INTERVAL_BLE
-#define FAST_ADV_INTERVAL_BLE 500
+#define FAST_ADV_INTERVAL_BLE 200
 #endif
 #define FAST_ADV_INT_BLE_COMP (FAST_ADV_INTERVAL_BLE<<3)/5
 // <o> Fast Advertise Time out - seconds <0-600:5>
 // <i> Timeout between 0 sec(unlimited) and 600 sec with step of 5 sec - FAST_ADV_TIMEOUT_BLE
 #ifndef FAST_ADV_TIMEOUT_BLE
-#define FAST_ADV_TIMEOUT_BLE 60
+#define FAST_ADV_TIMEOUT_BLE 15
 #endif
 // <o> Slow Advertise Interval - mseconds <1000-30000:5>
 #ifndef SLOW_ADV_INTERVAL_BLE
@@ -84,12 +84,12 @@
 // <o> Slow Advertise Time out - seconds <0-3600:5>
 // <i> Timeout between  0 sec(unlimited) and 1h with step of 5 sec - SLOW_ADV_TIMEOUT_BLE
 #ifndef SLOW_ADV_TIMEOUT_BLE
-#define SLOW_ADV_TIMEOUT_BLE 60
+#define SLOW_ADV_TIMEOUT_BLE 0
 #endif
 // <o> WakeUp BLE after end of advertising Time out - seconds <00-600:10>
 // <i> Timeout between 0 sec(unlimited) and 10 min with step of 10 sec - WAKE_ADV_TIMEOUT_BLE
 #ifndef WAKE_ADV_TIMEOUT_BLE
-#define WAKE_ADV_TIMEOUT_BLE 30
+#define WAKE_ADV_TIMEOUT_BLE 0
 #endif
 #define WAKE_ADV_TIMEOUT_BLE_MS (uint32_t)(WAKE_ADV_TIMEOUT_BLE * 1000u)
 // <s> Default Prefix BLE Name
