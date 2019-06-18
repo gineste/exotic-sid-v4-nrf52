@@ -59,7 +59,7 @@
 #define NO_TIMER                       ((uint32_t)0u)
 
 #define INIT_CB_TIMER_MS               ((uint32_t)200u)
-#define OPERATIONAL_CB_TIMER_MS        ((uint32_t)1000u)
+#define OPERATIONAL_CB_TIMER_MS        ((uint32_t)250u)
 #define CONNECTED_CB_TIMER_MS          1000u
 #define DEEPSLEEP_CB_TIMER_MS          NO_TIMER//MIN_TO_MS(1u)
 

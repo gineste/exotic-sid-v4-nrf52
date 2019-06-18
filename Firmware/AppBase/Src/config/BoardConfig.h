@@ -68,13 +68,13 @@
 #endif
 // <o> Fast Advertise Interval - mseconds <10-1000:5>
 #ifndef FAST_ADV_INTERVAL_BLE
-#define FAST_ADV_INTERVAL_BLE 200
+#define FAST_ADV_INTERVAL_BLE 250
 #endif
 #define FAST_ADV_INT_BLE_COMP (FAST_ADV_INTERVAL_BLE<<3)/5
 // <o> Fast Advertise Time out - seconds <0-600:5>
 // <i> Timeout between 0 sec(unlimited) and 600 sec with step of 5 sec - FAST_ADV_TIMEOUT_BLE
 #ifndef FAST_ADV_TIMEOUT_BLE
-#define FAST_ADV_TIMEOUT_BLE 15
+#define FAST_ADV_TIMEOUT_BLE 0
 #endif
 // <o> Slow Advertise Interval - mseconds <1000-30000:5>
 #ifndef SLOW_ADV_INTERVAL_BLE
